@@ -14,6 +14,7 @@ Frontend moderno desarrollado con **React 19** que implementa un flujo completo 
 - ✅ **Navegación Fluida**: Avanzar/Retroceder entre pasos con validación
 - ✅ **Feedback Visual**: Estados de carga, errores y éxito claramente indicados
 - ✅ **Datos Persistentes**: Información del usuario mantenida durante todo el flujo
+- ✅ **Visualización de Cantidades**: Productos con cantidades múltiples muestran badge "x2", "x3"
 
 ### 💳 Métodos de Pago
 - ✅ **Stripe**: Tarjetas de crédito/débito internacionales
@@ -27,13 +28,18 @@ Frontend moderno desarrollado con **React 19** que implementa un flujo completo 
   - Número de tarjeta: espacios cada 4 dígitos (XXXX XXXX XXXX XXXX)
   - Fecha expiración: formato MM/YY con slash automático
   - Backspace inteligente en campos formateados
-- ✅ **Validación CVV**: Algoritmo de Luhn implementado
+- ✅ **Validación CVV Mejorada**: 
+  - Máximo 4 dígitos (Amex y Visa/Mastercard)
+  - Solo acepta números (sin letras ni símbolos)
+  - Validación en tiempo real con feedback
 - ✅ **Headers de Seguridad**: x-session-id y x-user-id en cada request
 - ✅ **HTTPS Obligatorio**: Comunicación cifrada con certificados SSL
 
 ### 📊 Gestión del Pedido
 - ✅ **Cálculo Automático**: Subtotal, impuestos (19% IVA) y total
 - ✅ **Resumen Detallado**: Listado de productos con cantidades y precios
+- ✅ **Cantidades Visibles**: Badge "x2", "x3" para productos múltiples
+- ✅ **Precio Total por Ítem**: Muestra precio unitario × cantidad
 - ✅ **Verificación de Datos**: Validación de carrito antes de procesar
 - ✅ **Confirmación Previa**: Revisión de todos los datos antes del pago
 
@@ -43,6 +49,8 @@ Frontend moderno desarrollado con **React 19** que implementa un flujo completo 
 - ✅ **Estados Visuales**: Indicadores claros de campos requeridos/opcionales
 - ✅ **Mensajes Claros**: Feedback comprensible en cada acción
 - ✅ **Prevención de Errores**: Validación proactiva antes de enviar
+- ✅ **Badges de Cantidad**: Visualización clara con "x2", "x3" en productos múltiples
+- ✅ **Formato de Moneda**: Separación de miles con puntos (ej: $291.502)
 
 ## 🚀 Tecnologías y Stack
 
@@ -174,9 +182,18 @@ La aplicación estará disponible en:
 
 Muestra el resumen del carrito de compras:
 - Lista de productos con cantidades y precios
+- **Badge visual "x2", "x3"** para productos con cantidad > 1
+- **Precio total por ítem** (precio unitario × cantidad)
 - Cálculo de subtotal
 - Aplicación de impuestos (19% IVA)
-- Total a pagar
+- Total a pagar con formato de moneda chilena
+
+**Ejemplo visual:**
+```
+Audífonos Pro x2          $59,980
+Mouse Inalámbrico         $14,990
+Teclado Mecánico x3      $149,970
+```
 
 **Acciones:**
 - ✅ Continuar al siguiente paso
@@ -190,13 +207,14 @@ Selección del proveedor y captura de datos:
 - **Nombre del titular**: Texto libre
 - **Número de tarjeta**: Auto-formateado (XXXX XXXX XXXX XXXX)
 - **Fecha de expiración**: Auto-formateado (MM/YY)
-- **CVV**: 3-4 dígitos
+- **CVV**: 3-4 dígitos (máximo 4, solo números)
 - **Email**: Validación de formato
 
 **Validaciones:**
 - ✅ Formato de tarjeta correcto
 - ✅ Fecha no vencida (mes/año válidos)
-- ✅ CVV de longitud correcta
+- ✅ CVV de longitud correcta (3-4 dígitos)
+- ✅ CVV solo acepta números (sin letras)
 - ✅ Email con formato válido
 - ✅ Todos los campos requeridos completados
 
@@ -233,6 +251,39 @@ Estados posibles:
 
 ### Datos de Prueba
 
+**🧪 Testing - Simulación de Errores:**
+
+Para probar el manejo de errores, modifica el carrito para que el total sea exactamente **666**:
+
+```javascript
+// Backend: src/data/carrito.json
+{
+  "items": [
+    {
+      "id": "prod-test",
+      "name": "Producto de prueba",
+      "price": 560,
+      "quantity": 1
+    }
+  ],
+  "subtotal": 560,
+  "iva": {
+    "rate": 0.19,
+    "percentage": 19,
+    "amount": 106,
+    "description": "Impuesto al Valor Agregado (IVA)"
+  },
+  "total": 666  // ⚠️ Monto especial para simular error
+}
+```
+
+**Comportamiento esperado:**
+- ✅ Frontend: Envía pago normalmente
+- ✅ Backend: Detecta amount=666 y simula error
+- ✅ Estado: PENDING → PROCESSING → FAILED
+- ✅ Log: Registra en `historial_de_errores` con fecha automática
+- ✅ Frontend: Muestra mensaje de error y botón "Reintentar"
+
 **Usuario de prueba:**
 ```javascript
 const testUser = {
@@ -247,7 +298,7 @@ Visa:       4242 4242 4242 4242
 Mastercard: 5555 5555 5555 4444
 Amex:       3782 822463 10005
 
-CVV: 123 (cualquier valor)
+CVV: 123 (cualquier valor de 3-4 dígitos)
 Fecha: cualquier fecha futura (ej. 12/25)
 ```
 
@@ -308,36 +359,74 @@ Response: {
 
 #### 3. **Procesar Pago**
 ```javascript
-POST https://localhost:3000/payments/processPayment
+POST https://localhost:3000/api/pagos
 Headers: {
   'x-session-id': 'session_abc123',
   'x-user-id': 'customer_12345'
 }
 Body: {
-  // Campos comunes
-  confirmationToken: 'conf_xyz789abc',
-  amount: 129900,
+  // Datos del pago
+  amount: 291502,
   currency: 'CLP',
-  userId: 'customer_12345',
   provider: 'stripe',
+  description: 'Compra en PulgaShop - 4 productos',
   
-  // Campos específicos de Stripe
-  cardNumber: '4242424242424242',
-  cardholderName: 'Juan Pérez',
-  expiryDate: '12/25',
-  cvv: '123',
-  email: 'juan@ejemplo.com'
+  // Seguridad (token de confirmación)
+  confirmationToken: 'conf_xyz789abc',
+  
+  // Datos de tarjeta (solo para Stripe)
+  cardSecurity: {
+    cvv: '123',                    // NUNCA se almacena en BD
+    last4Digits: '4242',           // SÍ se almacena
+    cardHolderName: 'JUAN PEREZ'   // SÍ se almacena
+  },
+  
+  // Metadata adicional
+  metadata: {
+    cartId: 'cart_019',
+    userId: 'user_123',
+    orderId: '1',
+    items: [
+      {
+        id: 'prod-001',
+        name: 'Audífonos Pro',
+        price: 29990,
+        quantity: 2
+      },
+      // ... más productos
+    ],
+    subtotal: 244960,
+    iva: {
+      rate: 0.19,
+      percentage: 19,
+      amount: 46542
+    },
+    total: 291502
+  }
 }
 
-Response: {
-  success: true,
-  transactionId: 'txn_abc123xyz',
-  message: 'Pago procesado exitosamente',
+Response (Éxito): {
+  id: 'pay_1762194548784_afethqd',
+  amount: 291502,
+  currency: 'CLP',
   provider: 'stripe',
-  amount: 129900,
-  currency: 'CLP'
+  status: 'COMPLETED',
+  transactionId: 'mock_pay_1762194548784_afethqd',
+  createdAt: '2025-11-03T18:29:08.793Z'
+}
+
+Response (Error - amount=666 para testing): {
+  statusCode: 422,
+  message: 'Error de prueba simulado - Pago rechazado',
+  error: 'Unprocessable Entity'
 }
 ```
+
+**⚠️ IMPORTANTE - Seguridad:**
+- El CVV se envía al backend pero **NUNCA se almacena**
+- Solo se guardan `last4Digits` y `cardHolderName`
+- El backend sanitiza automáticamente los datos antes de guardar
+- Cumplimiento PCI-DSS garantizado
 
 ### Servicio API (`api.service.js`)
 
@@ -426,6 +515,31 @@ const [loading, setLoading] = useState(false);            // Estado de carga
 
 **Características especiales:**
 
+**Validación CVV mejorada:**
+```javascript
+const handleCvvChange = (e) => {
+  // Solo acepta números, máximo 4 dígitos
+  let value = e.target.value.replace(/\D/g, ''); // Eliminar no-dígitos
+  if (value.length <= 4) {
+    setCvv(value);
+  }
+};
+
+// Input con restricciones
+<input
+  type="text"
+  maxLength="4"
+  pattern="\d*"
+  onChange={handleCvvChange}
+  placeholder="123"
+/>
+
+// Validación antes de enviar
+if (cvv.length < 3 || cvv.length > 4) {
+  return 'CVV debe tener 3 o 4 dígitos';
+}
+```
+
 **Auto-formateo de número de tarjeta:**
 ```javascript
 const handleCardNumberChange = (e) => {
@@ -501,8 +615,38 @@ Output: "1"
 // Fecha vencida
 "01/20" → Error: "Tarjeta expirada"
 
+// CVV con letras (prevenido por validación)
+Input: "12a" → Output: "12" (elimina automáticamente)
+
+// CVV más de 4 dígitos (prevenido por maxLength)
+Input: "12345" → Output: "1234" (trunca a 4)
+
 // Email inválido
 "correo@" → Error: "Email inválido"
+```
+
+#### Test 4: Visualización de Cantidades
+```javascript
+// Producto con cantidad 1
+Item: { name: "Mouse", price: 14990, quantity: 1 }
+Output: "Mouse          $14,990"
+
+// Producto con cantidad 2
+Item: { name: "Audífonos", price: 29990, quantity: 2 }
+Output: "Audífonos x2   $59,980"
+// Badge "x2" con estilo verde
+// Precio = 29990 × 2 = 59,980
+```
+
+#### Test 5: Simulación de Errores
+```javascript
+// Configurar amount=666 en backend
+1. Modificar Backend/src/data/carrito.json con total=666
+2. Frontend carga carrito normalmente ✅
+3. Usuario completa formulario ✅
+4. Backend detecta amount=666 → simula error ✅
+5. Frontend muestra error con botón "Reintentar" ✅
+6. Verificar historial_de_errores en BD ✅
 ```
 
 #### Test 4: Flujo Completo
@@ -520,12 +664,19 @@ Output: "1"
 **Checklist de pruebas:**
 - [ ] Auto-formateo funciona mientras escribes
 - [ ] Backspace borra correctamente en campos formateados
+- [ ] CVV solo acepta números (máximo 4 dígitos)
+- [ ] CVV rechaza letras y símbolos automáticamente
 - [ ] Validación muestra errores claros
 - [ ] No puedes avanzar con datos inválidos
 - [ ] Puedes volver atrás sin perder datos
 - [ ] Loading spinner aparece durante requests
 - [ ] Errores del backend se muestran correctamente
 - [ ] Pago exitoso muestra transactionId
+- [ ] Badge "x2", "x3" aparece solo cuando cantidad > 1
+- [ ] Precio total por ítem = precio unitario × cantidad
+- [ ] Simulación de errores funciona con amount=666
+- [ ] Datos de tarjeta (last4Digits, cardHolderName) se guardan
+- [ ] CVV nunca aparece en respuestas del backend
 
 ## 📚 Documentación Relacionada
 
@@ -596,7 +747,52 @@ npm run build
 
 Este proyecto es parte de un sistema de pagos educativo/demo.
 
-## 👨‍💻 Repositorios
+## � Changelog
+
+### v1.1.0 (2025-11-03) - Mejoras de UX y Validación
+
+#### 🎨 Interfaz de Usuario
+- **Agregado**: Visualización de cantidades en `OrderSummary.js`
+  - Badge "x2", "x3" para productos con cantidad > 1
+  - Solo muestra badge si cantidad > 1 (evita "x1" redundante)
+  - Diseño: fondo verde claro (#d1fae5) con texto verde oscuro
+  - Padding y border-radius para mejor apariencia
+- **Mejorado**: Precio por ítem ahora muestra total (precio × cantidad)
+  - Antes: mostraba solo precio unitario
+  - Ahora: muestra precio total del ítem
+  - Mejora claridad del resumen de pedido
+
+#### ✅ Validación
+- **Mejorado**: Validación CVV en `PaymentMethod.js`
+  - `maxLength="4"` para limitar entrada
+  - Regex `replace(/\D/g, '')` elimina letras y símbolos
+  - Solo acepta dígitos numéricos (0-9)
+  - Validación de longitud antes de submit (3-4 dígitos)
+  - Previene confusión y errores de formato
+
+#### 🔄 Sincronización con Backend
+- **Mejorado**: Manejo de `cardSecurity` en `App.js`
+  - Simplificado objeto `cardSecurity`
+  - Envía `cvv`, `last4Digits`, `cardHolderName`
+  - Alineado con cambios del backend (no guarda CVV)
+  - Debug logs para troubleshooting
+
+### v1.0.0 (2025-10-30) - Lanzamiento Inicial
+
+#### 🚀 Sistema Completo
+- Implementación completa de flujo de pagos en 4 pasos
+- Integración con backend NestJS
+- Soporte para Stripe, PayPal y Webpay
+- Auto-formateo inteligente de campos
+- Validación en tiempo real
+- HTTPS con certificados SSL
+- Headers de seguridad (x-session-id, x-user-id)
+- Diseño responsivo y moderno
+- Gestión de estados de carga y errores
+
+**📋 Ver historial completo de cambios:** [CHANGELOG.md](./CHANGELOG.md)
+
+## �‍💻 Repositorios
 
 - **GitHub Backend:** [@DanteChavez/IntegracionBack](https://github.com/DanteChavez/IntegracionBack)
 - **GitHub Frontend:** [@DanteChavez/IntegracionFront](https://github.com/DanteChavez/IntegracionFront)

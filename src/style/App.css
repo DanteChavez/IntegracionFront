@@ -98,6 +98,15 @@ input:focus{ outline:2px solid #d1fae5; border-color:var(--brand); }
 .summary-card h3{ margin-top:0; }
 .items{ list-style:none; padding:0; margin:8px 0 12px; display:flex; flex-direction:column; gap:6px; }
 .items li{ display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:6px; }
+.items .quantity{ 
+  font-weight:600; 
+  color:var(--brand-dark); 
+  background:#d1fae5; 
+  padding:2px 8px; 
+  border-radius:6px; 
+  font-size:12px;
+  margin-left:8px;
+}
 .totals{ display:flex; flex-direction:column; gap:6px; margin:8px 0 12px; }
 .totals .grand{ border-top:2px solid var(--line); padding-top:8px; }
 .method-mini{ display:flex; justify-content:space-between; color:#374151; }

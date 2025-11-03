@@ -44,8 +44,10 @@ export default function OrderSummary() {
       <ul className="items">
         {cartData.items.map(item => (
           <li key={item.id}>
-            <span>{item.name}</span>
-            <strong>{cartData.currency.symbol}{item.price.toLocaleString('es-CL')}</strong>
+            <span>
+              {item.name} {item.quantity > 1 && <span className="quantity">x{item.quantity}</span>}
+            </span>
+            <strong>{cartData.currency.symbol}{(item.price * item.quantity).toLocaleString('es-CL')}</strong>
           </li>
         ))}
       </ul>

@@ -23,14 +23,26 @@ export default function PaymentMethod({
     setSelectedMethod(m);
     // reset errores/estados sensibles al cambiar de método
     setErrors({});
-    onCardStatusChange && onCardStatusChange({ valid: false, masked: '' });
+    setCard({ number: '', name: '', expiry: '', cvv: '' }); // Reset card data
+    onCardStatusChange && onCardStatusChange({ valid: false, masked: '', cardData: null });
     onTransferStatusChange && onTransferStatusChange({ fileName: '' });
     setFileName('');
   };
 
   // Validación tarjeta (CA11, CA12, CA13, CA16)
   useEffect(() => {
-    if (selectedMethod !== 'stripe') return;
+    // Solo Stripe captura datos de tarjeta localmente
+    // Webpay y PayPal redirigen a sus propios portales
+    if (selectedMethod !== 'stripe') {
+      // Para Webpay, PayPal y otros métodos que redirigen
+      onCardStatusChange && onCardStatusChange({ 
+        valid: true, 
+        masked: '',
+        cardData: null
+      });
+      return;
+    }
+    
     const newErr = {};
     const onlyDigits = card.number.replace(/\D/g, '');
 
@@ -108,7 +120,7 @@ export default function PaymentMethod({
         })}
       </div>
 
-      {/* Form tarjeta (solo para Stripe) */}
+      {/* Form tarjeta (solo para Stripe - captura local) */}
       {selectedMethod === 'stripe' && (
         <div className="card-form">
           <div className="fg fg-full">
@@ -195,8 +207,14 @@ export default function PaymentMethod({
                 inputMode="numeric"
                 autoComplete="off"
                 placeholder="***"
+                maxLength="4"
                 value={card.cvv}
-                onChange={(e) => setCard({ ...card, cvv: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Solo números
+                  if (value.length <= 4) {
+                    setCard({ ...card, cvv: value });
+                  }
+                }}
               />
               {errors.cvv && <span className="error">{errors.cvv}</span>}
             </div>

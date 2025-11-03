@@ -133,6 +133,9 @@ const handlePaymentSuccess = () => {
         provider: selectedMethod, // stripe, paypal o webpay (en minúsculas)
         description: `Compra en PulgaShop - ${cartData?.items?.length || 0} productos`,
         metadata: {
+          cartId: cartData?.cartId || 'cart_unknown',
+          userId: cartData?.userId || userId,
+          orderId: '1',
           items: cartData?.items || [],
           subtotal: cartData?.subtotal || 0,
           iva: cartData?.iva || {},
@@ -179,9 +182,10 @@ const handlePaymentSuccess = () => {
       // ⚠️⚠️⚠️ CONFIGURACIÓN DE PRUEBA - CAMBIAR EN PRODUCCIÓN ⚠️⚠️⚠️
       // ============================================================
       
-      // Extraer datos de la tarjeta si es Stripe
+      // Extraer datos de tarjeta solo para Stripe (captura local)
+      // Webpay y PayPal redirigen a sus propios portales para capturar la tarjeta
       let cardSecurity = null;
-      if (selectedMethod === 'stripe' && cardStatus.cardData) {
+      if (cardStatus.cardData) {
         const expMatch = cardStatus.cardData.expiry.match(/^(\d{2})\/(\d{2})$/);
         const expiryMonth = expMatch ? parseInt(expMatch[1], 10) : null;
         const expiryYear = expMatch ? parseInt('20' + expMatch[2], 10) : null;
@@ -194,10 +198,12 @@ const handlePaymentSuccess = () => {
           expiryYear: expiryYear
         };
       } else {
-        // ⚠️ DATOS DE PRUEBA: Para PayPal y Webpay
-        // EN PRODUCCIÓN: Obtener CVV real del usuario o usar tokenización
+        // Para Webpay y PayPal: no hay datos de tarjeta capturados localmente
+        // La tarjeta se ingresa en los portales externos después de la redirección
         cardSecurity = {
-          cvv: '000' // CVV genérico para métodos que no requieren tarjeta
+          cvv: '000', // CVV genérico - no se captura localmente
+          last4Digits: null,
+          cardHolderName: null
         };
       }
       
@@ -215,6 +221,9 @@ const handlePaymentSuccess = () => {
         confirmationToken: tokenToUse, // Token de confirmación del backend
         description: `Compra en PulgaShop - ${cartData?.items?.length || 0} productos`,
         metadata: {
+          cartId: cartData?.cartId || 'cart_unknown',
+          userId: cartData?.userId || userId,
+          orderId: '1',
           items: cartData?.items || [],
           subtotal: cartData?.subtotal || 0,
           iva: cartData?.iva || {},
@@ -240,6 +249,17 @@ const handlePaymentSuccess = () => {
       // ============================================================
       // FIN DE CONFIGURACIÓN DE PRUEBA
       // ============================================================
+      
+      // Debug: verificar datos antes de enviar
+      console.log('🔍 Verificación de datos de tarjeta:', {
+        cardStatus: cardStatus,
+        cardData: cardStatus.cardData,
+        cardSecurity: {
+          cardHolderName: cardSecurity?.cardHolderName,
+          last4Digits: cardSecurity?.last4Digits,
+          cvv: '***'
+        }
+      });
       
       console.log('📤 Enviando pago al backend:', { ...paymentData, cardSecurity: { ...paymentData.cardSecurity, cvv: '***' } });
       
