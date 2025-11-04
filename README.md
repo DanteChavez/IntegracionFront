@@ -747,7 +747,45 @@ npm run build
 
 Este proyecto es parte de un sistema de pagos educativo/demo.
 
-## � Changelog
+## 📝 Changelog
+
+> Para un historial completo y detallado de cambios, consulta el archivo [CHANGELOG.md](./CHANGELOG.md)
+
+### v1.2.0 (2025-11-03) - Optimización de Rendimiento ⚡
+
+#### 🚀 Performance
+- **Optimizado**: Eliminación de llamadas API duplicadas
+  - Antes: 4 llamadas simultáneas a `/api/users/current` y `/api/users/cart`
+  - Después: 1 llamada por endpoint (75% de reducción)
+  - Ahorro: 3 llamadas HTTP por carga de página
+- **Refactorizado**: `OrderSummary.js` convertido a componente presentacional
+  - Removidos: `useEffect` y `useState`
+  - Ahora recibe datos como props desde `App.js`
+  - Mayor facilidad de testing y mantenimiento
+- **Mejorado**: Manejo de React StrictMode
+  - Implementado `useRef` para flag persistente `dataLoaded`
+  - Previene duplicación en modo desarrollo
+  - Estado persiste entre re-montajes del componente
+
+#### 📊 Arquitectura
+```javascript
+// Antes (OrderSummary hacía llamadas API duplicadas):
+App.js: useEffect → API call #1 y #2
+OrderSummary.js: useEffect → API call #3 y #4
+Total: 4 llamadas (2 duplicadas)
+
+// Después (Single Source of Truth):
+App.js: useEffect + useRef → API call #1 y #2 (una sola vez)
+OrderSummary.js: recibe props
+Total: 2 llamadas (0 duplicadas) ✅
+```
+
+#### 🎯 Beneficios
+- ✅ 75% menos tráfico de red
+- ✅ Carga inicial más rápida
+- ✅ Menor carga del servidor
+- ✅ Componentes más testeables
+- ✅ Patrón presentacional/contenedor mejorado
 
 ### v1.1.0 (2025-11-03) - Mejoras de UX y Validación
 

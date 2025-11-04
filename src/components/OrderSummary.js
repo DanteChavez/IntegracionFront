@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import apiService from '../services/api.service';
+import React from 'react';
 
-export default function OrderSummary() {
-  const [cartData, setCartData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadCart = async () => {
-      try {
-        const data = await apiService.getCart();
-        setCartData(data);
-      } catch (error) {
-        console.error('Error cargando carrito:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadCart();
-  }, []);
-
+/**
+ * Componente de resumen del pedido
+ * Recibe los datos del carrito como props desde App.js
+ * para evitar llamadas duplicadas al backend
+ */
+export default function OrderSummary({ cartData, loading }) {
   if (loading) {
     return (
       <div className="summary-card">

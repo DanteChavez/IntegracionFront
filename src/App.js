@@ -1,4 +1,4 @@
-import React, { useEffect , useState, useMemo } from 'react';
+import React, { useEffect , useState, useMemo, useRef } from 'react';
 import apiService from './services/api.service';
 //import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DataVerification from './components/DataVerification';
@@ -10,6 +10,9 @@ import PaymentSuccess from './components/PaymentSuccess'; // Importar el compone
 
 
 function App() {
+  // Ref para prevenir doble carga en React StrictMode
+  const dataLoaded = useRef(false);
+  
   // Estados para el carrito (se cargará desde backend)
   const [cartData, setCartData] = useState(null);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -40,9 +43,24 @@ function App() {
   
   // Cargar métodos de pago y carrito al iniciar
   useEffect(() => {
-    loadPaymentMethods();
-    loadCart();
-  }, []);
+    // Prevenir doble carga en React StrictMode (desarrollo)
+    if (dataLoaded.current) {
+      console.log('⏭️ Carga ya realizada, saltando...');
+      return;
+    }
+    
+    dataLoaded.current = true;
+    
+    const loadData = async () => {
+      // Cargar en paralelo para mejor rendimiento
+      await Promise.all([
+        loadPaymentMethods(),
+        loadCart()
+      ]);
+    };
+    
+    loadData();
+  }, []); // Array vacío = solo se ejecuta al montar
   
   const loadCart = async () => {
     try {
@@ -458,7 +476,7 @@ const handlePaymentSuccess = () => {
         </section>
 
         <aside className="pay-summary">
-          <OrderSummary />
+          <OrderSummary cartData={cartData} loading={loading} />
         </aside>
       </main>
       )}
