@@ -127,7 +127,7 @@ const handlePaymentSuccess = () => {
     if (step === 3) return true; // Confirmación visual
     if (step === 4) return true; // Botón pagar controla estados
     return false;
-  }, [step, dataValid, selectedMethod, cardStatus.valid, transferStatus.fileName, timeExpired, failedAttempts]);
+  }, [step, dataValid, selectedMethod, cardStatus.valid, timeExpired, failedAttempts]);
 
 
   const nextStep = () => setStep((s) => Math.min(4, s + 1));
