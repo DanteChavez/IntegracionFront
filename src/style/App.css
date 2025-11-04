@@ -56,7 +56,7 @@ body{
 .btn{ padding:10px 16px; border-radius:8px; border:1px solid transparent; cursor:pointer; font-weight:600; }
 .btn.primary{ background:var(--brand); color:#fff; }
 .btn.primary:disabled{ background:#cbd5e1; cursor:not-allowed; }
-.btn.ghost{ background:#fff; border-color:var(--line); color:var(--text); }
+.btn.ghost{ background:#e42d2d; border-color:var(--line); color:#ffffff; }
 
 /* Forms */
 .form-grid{
