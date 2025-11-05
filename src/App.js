@@ -161,7 +161,6 @@ const handlePaymentSuccess = () => {
         metadata: {
           cartId: cartData?.cartId || 'cart_unknown',
           userId: cartData?.userId || userId,
-          orderId: '1',
           items: cartData?.items || [],
           subtotal: cartData?.subtotal || 0,
           iva: cartData?.iva || {},
@@ -249,7 +248,6 @@ const handlePaymentSuccess = () => {
         metadata: {
           cartId: cartData?.cartId || 'cart_unknown',
           userId: cartData?.userId || userId,
-          orderId: '1',
           items: cartData?.items || [],
           subtotal: cartData?.subtotal || 0,
           iva: cartData?.iva || {},
