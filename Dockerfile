@@ -15,13 +15,13 @@ COPY . .
 # Build the application for production
 RUN npm run build
 
-# Stage 2: Serve with HTTPS using http-server
+# Stage 2: Serve with HTTPS using custom Express server
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install http-server with SSL support
-RUN npm install -g http-server
+# Install Express for custom server
+RUN npm install express
 
 # Copy the build output from the previous stage
 COPY --from=build /app/build ./build
@@ -29,8 +29,11 @@ COPY --from=build /app/build ./build
 # Copy SSL certificates from the local secrets folder
 COPY --from=build /app/secrets /app/secrets
 
+# Copy custom SPA server
+COPY spa-server.js ./
+
 # Expose port 3001 for HTTPS
 EXPOSE 3001
 
-# Serve with HTTPS using the certificates
-CMD ["http-server", "build", "-p", "3001", "-S", "-C", "/app/secrets/pulgashopcert.pem", "-K", "/app/secrets/pulgashopkey.pem"]
+# Start the custom HTTPS server with SPA routing support
+CMD ["node", "spa-server.js"]

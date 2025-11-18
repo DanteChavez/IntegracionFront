@@ -386,6 +386,9 @@ const handlePaymentSuccess = () => {
           loading={loading}
           onCancel={cancelFlow}
           onPaid={processPayment}
+          totalAmount={totalAmount}
+          sessionId={sessionId}
+          userId={userId}
               />
             )}
             

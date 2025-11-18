@@ -1,11 +1,15 @@
 import React from 'react';
+import PayPalButton from './PayPalButton';
 
-export default function Payment({ selectedMethod, disabled, loading, onCancel, onPaid }) {
+export default function Payment({ selectedMethod, disabled, loading, onCancel, onPaid, totalAmount, sessionId, userId }) {
   const handlePay = async () => {
     if (onPaid) {
       await onPaid();
     }
   };
+
+  // Para PayPal, mostramos el botón especial de PayPal
+  const isPayPal = selectedMethod === 'paypal';
 
   return (
     <div className="panel">
@@ -28,7 +32,22 @@ export default function Payment({ selectedMethod, disabled, loading, onCancel, o
         <button type="button" className="btn ghost" onClick={onCancel} disabled={loading}>
           Cancelar
         </button>
-        {selectedMethod ? (
+        
+        {/* Botón especial de PayPal */}
+        {isPayPal && selectedMethod && !disabled && (
+          <PayPalButton 
+            amount={totalAmount}
+            description="Compra en PulgaShop"
+            sessionId={sessionId}
+            userId={userId}
+            onError={(error) => {
+              console.error('Error en pago PayPal:', error);
+            }}
+          />
+        )}
+        
+        {/* Botón normal para otros métodos */}
+        {!isPayPal && selectedMethod && (
           <button 
             type="button" 
             className="btn primary" 
@@ -37,7 +56,9 @@ export default function Payment({ selectedMethod, disabled, loading, onCancel, o
           >
             {loading ? 'Procesando...' : 'Pagar ahora'}
           </button>
-        ) : (
+        )}
+        
+        {!selectedMethod && (
           <button type="button" className="btn primary" disabled aria-disabled="true">
             Selecciona un método
           </button>

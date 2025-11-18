@@ -1,0 +1,70 @@
+.paypal-button {
+  width: 100%;
+  padding: 14px 24px;
+  background: #ffc439;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #003087;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 48, 135, 0.15);
+}
+
+.paypal-button:hover {
+  background: #f5b800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 48, 135, 0.25);
+}
+
+.paypal-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 48, 135, 0.2);
+}
+
+.paypal-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.paypal-button.loading {
+  background: #f5b800;
+}
+
+.paypal-logo {
+  height: 20px;
+  width: auto;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 48, 135, 0.3);
+  border-top-color: #003087;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .paypal-button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .paypal-logo {
+    height: 18px;
+  }
+}
