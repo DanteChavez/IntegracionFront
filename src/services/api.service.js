@@ -5,7 +5,7 @@
  * Maneja errores, timeouts y certificados auto-firmados en desarrollo
  */
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:3000/api';
+const API_URL = 'https://localhost:6161/api';
 const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT) || 30000;
 
 /**
@@ -64,8 +64,8 @@ async function apiFetch(endpoint, options = {}) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
       throw new Error(
         'No se pudo conectar con el servidor. Verifica:\n' +
-        '1. Que el backend esté ejecutándose en https://localhost:3000\n' +
-        '2. Que hayas aceptado el certificado auto-firmado visitando https://localhost:3000/api\n' +
+        '1. Que el backend esté ejecutándose en https://localhost:6161\n' +
+        '2. Que hayas aceptado el certificado auto-firmado visitando https://localhost:6161/api\n' +
         '3. Que no haya un firewall bloqueando la conexión'
       );
     }
@@ -212,6 +212,17 @@ const apiService = {
   getCart: async () => {
     return apiFetch('/users/cart', {
       method: 'GET',
+    });
+  },
+
+  /**
+   * Ejecutar un pago de PayPal
+   * POST /api/paypal/execute-payment
+   */
+  executePaypalPayment: async (data) => {
+    return apiFetch('/paypal/execute-payment', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

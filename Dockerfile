@@ -32,8 +32,8 @@ COPY --from=build /app/secrets /app/secrets
 # Copy custom SPA server
 COPY spa-server.js ./
 
-# Expose port 3001 for HTTPS
-EXPOSE 3001
+# Expose port 6060 for HTTPS
+EXPOSE 6060
 
 # Start the custom HTTPS server with SPA routing support
 CMD ["node", "spa-server.js"]
