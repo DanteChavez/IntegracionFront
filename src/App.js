@@ -7,6 +7,7 @@ import Confirmation from './components/Confirmation';
 import Payment from './components/Payment';
 import OrderSummary from './components/OrderSummary';
 import PaymentSuccess from './components/PaymentSuccess'; // Importar el componente de éxito
+import { PulgashopFooter } from "./components/PulgashopFooter";
 
 
 function App() {
@@ -419,48 +420,6 @@ const handlePaymentSuccess = () => {
                 </button>
               </div>
             )}
-                    <footer
-                      role="contentinfo"
-                      className="app-footer"
-                      aria-label="Pie de página PulgaShop"
-                      style={{
-                       position: 'fixed',
-                       left: 0,
-                       right: 0,
-                       bottom: 0,
-                       zIndex: 999,
-                       backgroundColor: '#1abc3dff',
-                       color: '#ffffff',
-                       padding: '50px 30px',
-                       borderRadius: 0,
-                       boxSizing: 'border-box',
-                      }}
-                    >
-                      <div
-                       className="footer-inner"
-                       style={{
-                        maxWidth: 1100,
-                        margin: '0 auto',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 20,
-                       }}
-                      >
-                       <div className="footer-left" style={{ minWidth: 0 }}>
-                        <strong style={{fontSize: 20, display: 'block', marginBottom: 6 }}>PulgaShop</strong>
-                        <div style={{ fontSize: 17, lineHeight: 1.2 }}>Av. España 1234, Valparaíso, Chile</div>
-                       </div>
-
-                       <div className="footer-right" style={{ textAlign: 'right', fontSize: 20 }}>
-                        <div>Contacto: contacto@pulgashop.cl</div>
-                        <div>Tel: +56 9 1234 5678</div>
-                       </div>
-                      </div>
-                    </footer>
-
-                   {/* Spacer para que el contenido/controles no queden ocultos detrás del footer fijo */}
-                   <div aria-hidden style={{ height: 90, width: '100%' }} />
 
                    <div className="nav-row" style={{ zIndex: 1000 }}>
                     <button className="btn ghost" onClick={prevStep} disabled={step === 1}>Anterior</button>
@@ -491,6 +450,7 @@ const handlePaymentSuccess = () => {
         </aside>
       </main>
       )}
+      <PulgashopFooter />   {/* 👈 NUEVO FOOTER */}
     </div>
   );
 }
