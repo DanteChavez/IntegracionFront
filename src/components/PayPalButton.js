@@ -16,7 +16,7 @@ function PayPalButton({ amount, description, sessionId, userId, onSuccess, onErr
       console.log('Solicitando creación de orden PayPal al backend');
 
       // El backend maneja TODA la lógica de PayPal (credenciales, SDK, etc.)
-      const response = await fetch('https://localhost:3000/api/paypal/create-payment', {
+      const response = await fetch('https://localhost:6161/api/paypal/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

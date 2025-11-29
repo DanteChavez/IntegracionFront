@@ -4,7 +4,7 @@ const path = require('path');
 const express = require('express');
 
 const app = express();
-const PORT = 3001;
+const PORT = 6060;
 
 // Servir archivos estáticos desde /build
 app.use(express.static(path.join(__dirname, 'build')));

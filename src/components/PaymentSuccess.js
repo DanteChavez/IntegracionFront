@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../style/PaymentResult.css';
+import apiService from '../services/api.service';
 
 /**
  * Componente de éxito de pago de PayPal
@@ -30,25 +31,12 @@ function PaymentSuccess() {
 
         console.log('Solicitando ejecución de pago al backend:', { orderId, payerId });
 
-        // El backend captura el pago usando PayPal SDK (con credenciales seguras)
-        const response = await fetch('https://localhost:3000/api/paypal/execute-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            orderId,
-            payerId,
-            token,
-          }),
+        const data = await apiService.executePaypalPayment({
+          orderId,
+          payerId,
+          token,
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al ejecutar el pago');
-        }
-
-        const data = await response.json();
         console.log('Pago ejecutado:', data);
 
         setPaymentData(data);
