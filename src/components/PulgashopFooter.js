@@ -62,7 +62,7 @@ export function PulgashopFooter() {
             </div>
           </div>
 
-          {/* Enlaces rápidos */}
+          {/* Enlaces Rápidos */}
           <div className="space-y-4">
             <h3 className="font-medium text-lg">Enlaces Rápidos</h3>
             <div className="space-y-2 text-sm opacity-90">
@@ -81,7 +81,7 @@ export function PulgashopFooter() {
             </div>
           </div>
 
-          {/* Descargar app */}
+          {/* Descargar App */}
           <div className="space-y-4">
             <h3 className="font-medium text-lg">Descargar App</h3>
             <div className="space-y-3">
@@ -101,9 +101,8 @@ export function PulgashopFooter() {
                   </div>
                 </div>
               </div>
-
-              {/* Redes */}
               <div className="flex gap-4 pt-2">
+                <div className="w-6 h-6 bg-white/20 rounded" />
                 <div className="w-6 h-6 bg-white/20 rounded" />
                 <div className="w-6 h-6 bg-white/20 rounded" />
                 <div className="w-6 h-6 bg-white/20 rounded" />
