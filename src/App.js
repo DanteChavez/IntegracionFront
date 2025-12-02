@@ -7,7 +7,8 @@ import Confirmation from './components/Confirmation';
 import Payment from './components/Payment';
 import OrderSummary from './components/OrderSummary';
 import PaymentSuccess from './components/PaymentSuccess'; // Importar el componente de éxito
-import { PulgashopFooter } from "./components/PulgashopFooter";
+import PulgashopFooter from "./components/PulgashopFooter";
+
 
 
 function App() {

@@ -1,0 +1,125 @@
+/* Fondo y texto */
+.ps-footer {
+  background: #22c55e;
+  color: white;
+  margin-top: 48px; /* mt-12 */
+}
+
+/* Contenedor centrado */
+.ps-footer-container {
+  max-width: 1200px;   /* similar a container mx-auto */
+  margin: 0 auto;
+  padding: 48px 16px;  /* py-12 px-4 */
+}
+
+/* GRID */
+.ps-grid {
+  display: grid;
+  gap: 32px; /* gap-8 */
+}
+
+@media (min-width: 768px) {
+  .ps-grid {
+    grid-template-columns: repeat(2, 1fr); /* md:grid-cols-2 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .ps-grid {
+    grid-template-columns: repeat(5, 1fr); /* lg:grid-cols-5 */
+  }
+}
+
+/* Márgenes verticales */
+.ps-space-y-4 > * + * {
+  margin-top: 16px;
+}
+
+.ps-space-y-3 > * + * {
+  margin-top: 12px;
+}
+
+.ps-space-y-2 > * + * {
+  margin-top: 8px;
+}
+
+/* Textos */
+.ps-text-sm {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.ps-text-xs {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* Input + botón */
+.ps-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-size: 14px;
+  border-radius: 4px 0 0 4px;
+}
+
+.ps-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ps-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.ps-button {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: none;
+  background: transparent;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.ps-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Bloques cuadrados y rectángulos "fake" */
+.ps-box {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps-inner-box {
+  background: rgba(255, 255, 255, 0.2);
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+}
+
+.ps-rect {
+  width: 96px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Iconos redondos */
+.ps-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.2);
+}
