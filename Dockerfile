@@ -13,6 +13,9 @@ RUN npm install
 # Copiar el resto del proyecto
 COPY . .
 
+# Nueva línea (crea /build)
+RUN npm run build
+
 # --- Dejas tu puerto original (por registro) ---
 EXPOSE 3001
 
