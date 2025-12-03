@@ -13,8 +13,14 @@ RUN npm install
 # Copiar el resto del proyecto
 COPY . .
 
-# Exponer el puerto del frontend (3001)
+# --- Dejas tu puerto original (por registro) ---
 EXPOSE 3001
 
-# Comando por defecto
-CMD ["npm", "start"]
+# --- Nuevo puerto real que usa el frontend dentro del contenedor ---
+EXPOSE 6060
+
+# Para spa-server.js necesitas express
+RUN npm install express
+
+# Ejecutar tu servidor HTTPS personalizado
+CMD ["node", "spa-server.js"]
