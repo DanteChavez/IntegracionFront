@@ -6,12 +6,12 @@ const express = require('express');
 const app = express();
 const PORT = 6060;
 
-// Servir archivos estáticos desde /build
-app.use(express.static(path.join(__dirname, 'build')));
+// Servir archivos estáticos desde /static-build
+app.use(express.static('/static-build'));
 
-// Para cualquier otra ruta, servir index.html (SPA routing)
+// Para cualquier otra ruta, index.html del build copiado
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile('/static-build/index.html');
 });
 
 // Configurar HTTPS
