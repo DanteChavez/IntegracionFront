@@ -5,7 +5,8 @@
  * Maneja errores, timeouts y certificados auto-firmados en desarrollo
  */
 
-const API_URL = 'https://localhost:6161/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:6161/api';
+const CARRITO_API_URL = process.env.REACT_APP_CARRITO_API_URL || 'http://localhost:5000/api/v1';
 const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT) || 30000;
 
 /**
@@ -213,6 +214,89 @@ const apiService = {
     return apiFetch('/users/cart', {
       method: 'GET',
     });
+  },
+
+  /**
+   * Obtener carrito desde micro-servicio externo por ID de carrito
+   * GET http://localhost:5000/api/v1/carrito/obtenerCarro/{carritoId}
+   */
+  getCartFromExternalService: async (carritoId) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+    try {
+      const response = await fetch(`${CARRITO_API_URL}/carrito/obtenerCarro/${carritoId}`, {
+        method: 'GET',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Error obteniendo carrito externo:', errorData);
+        throw new Error(
+          errorData.message || 
+          `Error ${response.status}: ${response.statusText}`
+        );
+      }
+
+      const cartData = await response.json();
+      
+      // Calcular subtotal e IVA
+      const subtotal = cartData.items.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+      const ivaPercentage = 19; // IVA Chile
+      const ivaAmount = Math.round(subtotal * ivaPercentage / 100);
+      const total = subtotal + ivaAmount;
+      
+      // Transformar los datos al formato esperado por el frontend
+      return {
+        id: cartData.id,
+        compradorId: cartData.compradorId,
+        subtotal: subtotal,
+        iva: {
+          percentage: ivaPercentage,
+          amount: ivaAmount,
+        },
+        total: total,
+        currency: {
+          code: 'CLP',
+          symbol: '$',
+        },
+        items: cartData.items.map(item => ({
+          id: item.productoId,
+          name: item.name,
+          description: item.description,
+          category: item.category,
+          imageUrl: item.imageUrl,
+          price: item.precio,
+          quantity: item.cantidad,
+          subtotal: item.precio * item.cantidad,
+        })),
+        checkout: {
+          timeoutSeconds: 600, // 10 minutos por defecto
+        },
+        createdAt: cartData.createdAt,
+        updatedAt: cartData.updatedAt,
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('La solicitud al servicio de carrito tardó demasiado.');
+      }
+      
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new Error(
+          'No se pudo conectar con el servicio de carrito.'
+        );
+      }
+      
+      throw error;
+    }
   },
 
   /**

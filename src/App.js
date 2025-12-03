@@ -39,8 +39,27 @@ function App() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [sessionId] = useState(`session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-  const [userId] = useState('anonymous'); // ⚠️ PRUEBA: En producción, obtener del usuario autenticado
+  
+  // Leer IDs desde URL si vienen del micro-servicio externo
+  const urlParams = new URLSearchParams(window.location.search);
+  const idCarritoFromUrl = urlParams.get('idCarrito');
+  const idUsuarioFromUrl = urlParams.get('idUsuario');
+  
+  const [sessionId] = useState(() => {
+    if (idCarritoFromUrl && idUsuarioFromUrl) {
+      console.log(`🔗 IDs recibidos desde micro-servicio - Carrito: ${idCarritoFromUrl}, Usuario: ${idUsuarioFromUrl}`);
+      return `session_${idCarritoFromUrl}_${idUsuarioFromUrl}`;
+    }
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  });
+  
+  const [userId] = useState(() => {
+    if (idUsuarioFromUrl) {
+      return idUsuarioFromUrl;
+    }
+    return 'anonymous'; // ⚠️ PRUEBA: En producción, obtener del usuario autenticado
+  });
+  
   const [confirmationToken, setConfirmationToken] = useState(null);
   
   // Datos del usuario (mejora del compañero - datos mock para confirmación)
@@ -74,16 +93,28 @@ function App() {
   
   const loadCart = async () => {
     try {
-      const data = await apiService.getCart();
+      let data;
+      
+      // Si viene idCarrito desde URL (micro-servicio externo), usar servicio de carrito externo
+      if (idCarritoFromUrl) {
+        console.log(`🔗 Cargando carrito desde micro-servicio externo con ID: ${idCarritoFromUrl}`);
+        data = await apiService.getCartFromExternalService(idCarritoFromUrl);
+        console.log('🛒 Carrito cargado desde micro-servicio externo:', data);
+      } else {
+        // Si no, usar el carrito del backend de pagos
+        data = await apiService.getCart();
+        console.log('🛒 Carrito cargado desde backend:', data);
+      }
+      
       setCartData(data);
       setTotalAmount(data.total);
       // Configurar el tiempo límite desde el backend
       if (data.checkout?.timeoutSeconds) {
         setTimeLeft(data.checkout.timeoutSeconds);
       }
-      console.log('🛒 Carrito cargado desde backend:', data);
     } catch (err) {
       console.error('❌ Error cargando carrito:', err);
+      setError(err.message);
     }
   };
   
