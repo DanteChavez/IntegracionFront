@@ -146,6 +146,7 @@ function App() {
     setUserData({
       name: data.name || data.fullName || "Usuario",
       surname: data.surname || "",
+      rut: data.rut || "",
       email: data.email || "",
       address: data.address || data.profile?.location || ""
     });
