@@ -424,9 +424,13 @@ const handlePaymentSuccess = () => {
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             {step === 1 && (
-              <DataVerification
+              
+
+              <DataVerification 
+          userData={userData}
           onValidityChange={setDataValid}
               />
+
             )}
 
             {step === 2 && (
