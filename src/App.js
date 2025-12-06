@@ -39,11 +39,15 @@ function App() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  //nuevo
+  const [externalUser, setExternalUser] = useState(null);
   
   // Leer IDs desde URL si vienen del micro-servicio externo
   const urlParams = new URLSearchParams(window.location.search);
   const idCarritoFromUrl = urlParams.get('idCarrito');
   const idUsuarioFromUrl = urlParams.get('idUsuario');
+  
   
   const [sessionId] = useState(() => {
     if (idCarritoFromUrl && idUsuarioFromUrl) {
@@ -63,7 +67,8 @@ function App() {
   const [confirmationToken, setConfirmationToken] = useState(null);
   
   // Datos del usuario (mejora del compañero - datos mock para confirmación)
-  const [userData] = useState({
+  //const [userData] = useState({
+  const [userData, setUserData] = useState({
     name: 'Mario',
     surname: 'Brito',
     email: 'mario.brito@gmail.com',
@@ -84,7 +89,8 @@ function App() {
       // Cargar en paralelo para mejor rendimiento
       await Promise.all([
         loadPaymentMethods(),
-        loadCart()
+        loadCart(),
+        loadExternalUser()
       ]);
     };
     
@@ -116,6 +122,17 @@ function App() {
       console.error('❌ Error cargando carrito:', err);
       setError(err.message);
     }
+  };
+
+  const loadExternalUser = async () => {
+  try {
+    if (!idUsuarioFromUrl) return;
+    const data = await apiService.getUserFromExternalService(idUsuarioFromUrl);
+    console.log("👤 Usuario externo cargado:", data);
+    setUserData(data);
+  } catch (err) {
+    console.error("❌ Error cargando usuario externo:", err);
+  }
   };
   
   const loadPaymentMethods = async () => {

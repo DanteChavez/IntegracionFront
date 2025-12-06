@@ -136,6 +136,20 @@ const apiService = {
     });
   },
 
+    /**
+   * Obtener usuario desde microservicio Python
+   */
+  getUserFromExternalService: async (idUsuario) => {
+    const url = `http://127.0.0.1:8001/user?id=${idUsuario}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Error al obtener usuario desde micro-servicio");
+    }
+    return response.json();
+  },
+
+
   /**
    * Obtener estado de un pago
    * GET /api/pagos/:id
