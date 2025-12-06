@@ -124,16 +124,38 @@ function App() {
     }
   };
 
+  //const loadExternalUser = async () => {
+  //try {
+    //if (!idUsuarioFromUrl) return;
+    //const data = await apiService.getUserFromExternalService(idUsuarioFromUrl);
+    //console.log("👤 Usuario externo cargado:", data);
+    //setUserData(data);
+  //} catch (err) {
+    //console.error("❌ Error cargando usuario externo:", err);
+  //}
+  //};
+
   const loadExternalUser = async () => {
   try {
     if (!idUsuarioFromUrl) return;
+
     const data = await apiService.getUserFromExternalService(idUsuarioFromUrl);
     console.log("👤 Usuario externo cargado:", data);
-    setUserData(data);
+
+    // 👇 IMPORTANTE: transformar el formato al que usa tu front
+    setUserData({
+      name: data.name || data.fullName || "Usuario",
+      surname: data.surname || "",
+      email: data.email || "",
+      address: data.address || data.profile?.location || ""
+    });
+
   } catch (err) {
     console.error("❌ Error cargando usuario externo:", err);
   }
   };
+
+
   
   const loadPaymentMethods = async () => {
     try {
