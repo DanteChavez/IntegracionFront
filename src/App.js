@@ -64,7 +64,7 @@ function App() {
   
   // Datos del usuario (mejora del compañero - datos mock para confirmación)
   const [userData] = useState({
-    name: 'Mario',
+    name: 'Mariooooo',
     surname: 'Brito',
     email: 'mario.brito@gmail.com',
     address: 'Jose Agustin #777, Quilpue, Chile'
