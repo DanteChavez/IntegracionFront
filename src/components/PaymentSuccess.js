@@ -99,7 +99,7 @@ function PaymentSuccess() {
             <div className="detail-row">
               <span className="label">Monto:</span>
               <span className="value">
-                ${(paymentData.amount / 100).toFixed(2)} {paymentData.currency}
+                ${(paymentData.amount / 1000).toFixed(2)} {paymentData.currency}
               </span>
             </div>
             <div className="detail-row">
